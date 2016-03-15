@@ -5,7 +5,7 @@ var init = function() {
 };
 
 var friends = [];
-var userName;
+var userName = 'Jexxebelle';
 
 var send = function(message) {
   $.ajax({
@@ -81,13 +81,18 @@ var app = {
   addFriend: addFriend,
 };
 $(document).ready(function() {
-  $('.submitFormJezzebelle').submit(function() {
+
+  $('#submitFormJezzebelle').submit(function(event) {
+    event.preventDefault();
     var newMessage = {
       username: userName,
-      text: document.getElementByName('message').value,
+      text: $('input:text').val(),
       roomname: 'lobby'
     };
+    app.send(newMessage);
+    return false;
   });
+
 });
 
 $(document).delegate('.username', 'click', app.addFriend);
