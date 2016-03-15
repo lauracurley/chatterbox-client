@@ -1,17 +1,19 @@
+var app = {};
 
-var init = function() {
+app.friends = [];
+app.rooms = [];
+app.userName;
+app.currentRoom = 'lobby';
+app.url = 'https://api.parse.com/1/classes/messages';
+
+app.init = function() {
   // console.log('refresh');
-  app.fetch('https://api.parse.com/1/classes/messages');
+  app.fetch(app.url);
 };
 
-var friends = [];
-var rooms = [];
-var userName;
-var currentRoom = 'lobby';
-
-var send = function(message) {
+app.send = function(message) {
   $.ajax({
-    url: 'https://api.parse.com/1/classes/messages',
+    url: app.url,
     type: 'POST',
     dataType: 'json',
     data: JSON.stringify(message),
@@ -21,8 +23,9 @@ var send = function(message) {
 
 // app's fetch url - 'https://api.parse.com/1/classes/messages'
 
-var fetch = function(url) {
+app.fetch = function(url) {
   $.ajax({
+    //    url: url + '?where={"roomname":"' + currentRoom + '"}',
     url: url,
     type: 'GET',
     dataType: 'json',
@@ -39,32 +42,32 @@ var fetch = function(url) {
   });
 };
 
-var clearMessages = function() {
+app.clearMessages = function() {
   $('#chats').empty();
 };
 
-var escapeHTML = function(str) {
+app.escapeHTML = function(str) {
   var div = document.createElement('div');
   div.appendChild(document.createTextNode(str));
   return div.innerHTML;
 };
 
-var compareFriends = function() {
+app.compareFriends = function() {
   console.log('FRIENDS ARRAY: ', friends);
 };
 
-var addMessage = function(message) {
-  var username = escapeHTML(message['username']);
-  var text = escapeHTML(message['text']);
-  var room = escapeHTML(message['roomname']);
-  if (rooms.indexOf(room) === -1) {
-    rooms.push(room);
+app.addMessage = function(message) {
+  var username = app.escapeHTML(message['username']);
+  var text = app.escapeHTML(message['text']);
+  var room = app.escapeHTML(message['roomname']);
+  if (app.rooms.indexOf(room) === -1) {
+    app.rooms.push(room);
     $('select').append('<option>' + room + '</option>');
   }
   //console.log(currentRoom, room);
-  if (currentRoom === room) {
+  if (app.currentRoom === room) {
     var $message = $('<div class="username chat"></div>');
-    if (friends.indexOf(username) > -1) {
+    if (app.friends.indexOf(username) > -1) {
       $message = $message.append('<h2 style="color:blue;">' + username + '</h2>');
     } else {
       $message = $message.append('<h2>' + username + '</h2>');
@@ -72,51 +75,44 @@ var addMessage = function(message) {
 
     $message = $message.append('<p>' + text + '</p>');
     $('#chats').append($message);
-  }
+  } else { console.log('not current room'); }
 };
 
-var addRoom = function(roomName) {
+app.addRoom = function(roomName) {
   $('#roomSelect').append('<div>' + roomName + '</div>');
 };
 
-var addFriend = function() {
+app.addFriend = function() {
   var name = $(this)[0].firstChild.textContent;
-  if (friends.indexOf(name) === -1) {
-    friends.push(name);
+  if (app.friends.indexOf(name) === -1) {
+    app.friends.push(name);
   }
 };
 
 //TODO: Make this filter stuff
-var filterMessages = function(data) {
+app.filterMessages = function(data) {
   _.each(data.results, function(message, i, list) {
-    messages.push(message);
+    app.messages.push(message);
   });
 };
 
-var app = {
-  init: init,
-  send: send,
-  fetch: fetch,
-  clearMessages: clearMessages,
-  addMessage: addMessage,
-  addRoom: addRoom,
-  addFriend: addFriend,
+app.handleSubmit = function(event) {
+  event.preventDefault();
+  var newMessage = {
+    username: $('input[name*="username"]').val(),
+    text: $('input[name*="message"]').val(),
+    roomname: $('input[name*="room"]').val()
+  };
+  app.send(newMessage);
+  return false;
 };
+
 $(document).ready(function() {
 
-  $('#submitFormJezzebelle').submit(function(event) {
-    event.preventDefault();
-    var newMessage = {
-      username: $('input[name*="username"]').val(),
-      text: $('input[name*="message"]').val(),
-      roomname: $('input[name*="room"]').val()
-    };
-    app.send(newMessage);
-    return false;
-  });
+  $('#submitFormJezzebelle').submit(app.handleSubmit);
+
   $('select').on('change', function() {
-    console.log($(this).val());
-    currentRoom = $(this).val();
+    app.currentRoom = $(this).val();
   });
 
 });
