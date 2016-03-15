@@ -50,7 +50,13 @@ body {
     line-height: 13px;
 }
 
+button {
+    float: left;
+    margin: 0px 100px;
+}
+
 form {
+    clear: both;
     padding: 20px;
     padding-left: 0;
     margin-bottom: 20px;

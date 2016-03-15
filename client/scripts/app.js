@@ -1,11 +1,11 @@
 
 var init = function() {
-  console.log('refresh');
+  // console.log('refresh');
   app.fetch('https://api.parse.com/1/classes/messages');
 };
 
 var friends = [];
-var userName = 'Jexxebelle';
+var userName;
 
 var send = function(message) {
   $.ajax({
@@ -85,8 +85,8 @@ $(document).ready(function() {
   $('#submitFormJezzebelle').submit(function(event) {
     event.preventDefault();
     var newMessage = {
-      username: userName,
-      text: $('input:text').val(),
+      username: $("input[name*='username']").val(),
+      text: $("input[name*='message']").val(),
       roomname: 'lobby'
     };
     app.send(newMessage);
