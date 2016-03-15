@@ -1,9 +1,11 @@
 
 var init = function() {
+  console.log('refresh');
   app.fetch('https://api.parse.com/1/classes/messages');
 };
 
 var friends = [];
+var userName;
 
 var send = function(message) {
   $.ajax({
@@ -24,6 +26,7 @@ var fetch = function(url) {
     dataType: 'json',
     success: function(data) {
       var messages = data.results;
+      app.clearMessages();
       _.each(messages, function(message, i, messages) {
         app.addMessage(message);
       });
@@ -38,10 +41,16 @@ var clearMessages = function() {
   $('#chats').empty();
 };
 
+var escapeHTML = function(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+};
+
 var addMessage = function(message) {
-  var $message = $('<div class="username"><div>');
-  $message.append('<h2>' + message['username'] + '</h2>');
-  $message.append('<p>' + message['text'] + '</p>');
+  var $message = $('<div class="username chat"></div>');
+  $message = $message.append('<h2>' + escapeHTML(message['username']) + '</h2>');
+  $message = $message.append('<p>' + escapeHTML(message['text']) + '</p>');
   $('#chats').append($message);
   // console.log(message['username'], message['text']);
 };
@@ -71,7 +80,16 @@ var app = {
   addRoom: addRoom,
   addFriend: addFriend,
 };
+$(document).ready(function() {
+  $('.submitFormJezzebelle').submit(function() {
+    var newMessage = {
+      username: userName,
+      text: document.getElementByName('message').value,
+      roomname: 'lobby'
+    };
+  });
+});
 
 $(document).delegate('.username', 'click', app.addFriend);
 
-app.init();
+setInterval(app.init, 1000);
