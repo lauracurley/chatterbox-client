@@ -47,12 +47,25 @@ var escapeHTML = function(str) {
   return div.innerHTML;
 };
 
+var compareFriends = function() {
+  console.log('FRIENDS ARRAY: ', friends);
+};
+
 var addMessage = function(message) {
+  var username = escapeHTML(message['username']);
+  var text = escapeHTML(message['text']);
   var $message = $('<div class="username chat"></div>');
-  $message = $message.append('<h2>' + escapeHTML(message['username']) + '</h2>');
-  $message = $message.append('<p>' + escapeHTML(message['text']) + '</p>');
+
+  // console.log(username);
+  // console.log(friends.indexOf(username));
+  if (friends.indexOf(username) > -1) {
+    $message = $message.append('<h2 style="color:blue;">' + username + '</h2>');
+  } else {
+    $message = $message.append('<h2>' + username + '</h2>');
+  }
+
+  $message = $message.append('<p>' + text + '</p>');
   $('#chats').append($message);
-  // console.log(message['username'], message['text']);
 };
 
 var addRoom = function(roomName) {
@@ -60,8 +73,10 @@ var addRoom = function(roomName) {
 };
 
 var addFriend = function() {
-  friends.push($(this)[0].textContent);
-  // console.log("addFriend");
+  var name = $(this)[0].firstChild.textContent;
+  if (friends.indexOf(name) === -1) {
+    friends.push(name);
+  }
 };
 
 //TODO: Make this filter stuff
@@ -97,4 +112,4 @@ $(document).ready(function() {
 
 $(document).delegate('.username', 'click', app.addFriend);
 
-setInterval(app.init, 1000);
+//setInterval(app.init, 1000);
