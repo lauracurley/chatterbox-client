@@ -5,7 +5,9 @@ var init = function() {
 };
 
 var friends = [];
+var rooms = [];
 var userName;
+var currentRoom = 'lobby';
 
 var send = function(message) {
   $.ajax({
@@ -54,18 +56,23 @@ var compareFriends = function() {
 var addMessage = function(message) {
   var username = escapeHTML(message['username']);
   var text = escapeHTML(message['text']);
-  var $message = $('<div class="username chat"></div>');
-
-  // console.log(username);
-  // console.log(friends.indexOf(username));
-  if (friends.indexOf(username) > -1) {
-    $message = $message.append('<h2 style="color:blue;">' + username + '</h2>');
-  } else {
-    $message = $message.append('<h2>' + username + '</h2>');
+  var room = escapeHTML(message['roomname']);
+  if (rooms.indexOf(room) === -1) {
+    rooms.push(room);
+    $('select').append('<option>' + room + '</option>');
   }
+  //console.log(currentRoom, room);
+  if (currentRoom === room) {
+    var $message = $('<div class="username chat"></div>');
+    if (friends.indexOf(username) > -1) {
+      $message = $message.append('<h2 style="color:blue;">' + username + '</h2>');
+    } else {
+      $message = $message.append('<h2>' + username + '</h2>');
+    }
 
-  $message = $message.append('<p>' + text + '</p>');
-  $('#chats').append($message);
+    $message = $message.append('<p>' + text + '</p>');
+    $('#chats').append($message);
+  }
 };
 
 var addRoom = function(roomName) {
@@ -100,16 +107,20 @@ $(document).ready(function() {
   $('#submitFormJezzebelle').submit(function(event) {
     event.preventDefault();
     var newMessage = {
-      username: $("input[name*='username']").val(),
-      text: $("input[name*='message']").val(),
-      roomname: 'lobby'
+      username: $('input[name*="username"]').val(),
+      text: $('input[name*="message"]').val(),
+      roomname: $('input[name*="room"]').val()
     };
     app.send(newMessage);
     return false;
+  });
+  $('select').on('change', function() {
+    console.log($(this).val());
+    currentRoom = $(this).val();
   });
 
 });
 
 $(document).delegate('.username', 'click', app.addFriend);
 
-//setInterval(app.init, 1000);
+setInterval(app.init, 1000);
