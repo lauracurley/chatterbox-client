@@ -1,16 +1,13 @@
 
 var init = function() {
-  _.each(messages, function(message, i, messages) {
-    app.addMessage(message);
-  });
-
+  app.fetch('https://api.parse.com/1/classes/messages');
 };
+
 var friends = [];
-var messages = [];
 
 var send = function(message) {
   $.ajax({
-    url: '',
+    url: 'https://api.parse.com/1/classes/messages',
     type: 'POST',
     dataType: 'json',
     data: JSON.stringify(message),
@@ -26,8 +23,10 @@ var fetch = function(url) {
     type: 'GET',
     dataType: 'json',
     success: function(data) {
-      messages = data.results;
-      console.log(messages);
+      var messages = data.results;
+      _.each(messages, function(message, i, messages) {
+        app.addMessage(message);
+      });
     },
     error: function(data) {
       console.log('fetch request failed : ' + data.toString());
@@ -40,18 +39,20 @@ var clearMessages = function() {
 };
 
 var addMessage = function(message) {
-  var $message = $('<div></div>');
-  $message.append('<h2 class="username">' + message['username'] + '</h2>');
+  var $message = $('<div class="username"><div>');
+  $message.append('<h2>' + message['username'] + '</h2>');
   $message.append('<p>' + message['text'] + '</p>');
   $('#chats').append($message);
+  // console.log(message['username'], message['text']);
 };
 
 var addRoom = function(roomName) {
   $('#roomSelect').append('<div>' + roomName + '</div>');
 };
 
-var addFriend = function(userName) {
-  friends.push(userName);
+var addFriend = function() {
+  friends.push($(this)[0].textContent);
+  // console.log("addFriend");
 };
 
 //TODO: Make this filter stuff
@@ -61,14 +62,16 @@ var filterMessages = function(data) {
   });
 };
 
-
 var app = {
   init: init,
   send: send,
   fetch: fetch,
   clearMessages: clearMessages,
   addMessage: addMessage,
-  addRoom: addRoom
+  addRoom: addRoom,
+  addFriend: addFriend,
 };
-// YOUR CODE HERE:
 
+$(document).delegate('.username', 'click', app.addFriend);
+
+app.init();
