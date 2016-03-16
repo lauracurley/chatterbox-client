@@ -1,5 +1,5 @@
 var app = {};
-
+ 
 app.friends = [];
 app.rooms = [];
 app.userName;
@@ -75,7 +75,7 @@ app.addMessage = function(message) {
 
     $message = $message.append('<p>' + text + '</p>');
     $('#chats').append($message);
-  } else { console.log('not current room'); }
+  } // else { console.log('not current room'); }
 };
 
 app.addRoom = function(roomName) {
